@@ -1,0 +1,60 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/Sirupsen/logrus",
+			"repository": "https://github.com/Sirupsen/logrus",
+			"revision": "e49c59d69b89746796d48156991108c80faf1d7d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/gorilla/handlers",
+			"repository": "https://github.com/gorilla/handlers",
+			"revision": "a4d79d4487c2430a17d9dc8a1f74d1a6ed6908ca",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/gorilla/mux",
+			"repository": "https://github.com/gorilla/mux",
+			"revision": "ac112f7d75a0714af1bd86ab17749b31f7809640",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/jtolds/gls",
+			"repository": "https://github.com/jtolds/gls",
+			"revision": "77f18212c9c7edc9bd6a33d383a7b545ce62f064",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/sirupsen/logrus",
+			"repository": "https://github.com/sirupsen/logrus",
+			"revision": "e49c59d69b89746796d48156991108c80faf1d7d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/smartystreets/assertions",
+			"repository": "https://github.com/smartystreets/assertions",
+			"revision": "4ea54c1f28ad3ae597e76607dea3871fa177e263",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/smartystreets/goconvey/convey",
+			"repository": "https://github.com/smartystreets/goconvey",
+			"revision": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857",
+			"branch": "master",
+			"path": "/convey"
+		},
+		{
+			"importpath": "gopkg.in/airbrake/gobrake.v2",
+			"repository": "https://gopkg.in/airbrake/gobrake.v2",
+			"revision": "668876711219e8b0206e2994bf0a59d889c775aa",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/gemnasium/logrus-airbrake-hook.v2",
+			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
+			"revision": "e928b033a891c0175fb643d5aa0779e86325eb12",
+			"branch": "master"
+		}
+	]
+}
