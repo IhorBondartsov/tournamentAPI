@@ -10,7 +10,9 @@ type StubDB struct {
 	Tournament map[int]*models.Tournament
 }
 
-func (base *StubDB) Init() (dao.DAOInterface, error) { return &StubDB{}, nil }
+func (base *StubDB) Init() (dao.DAOInterface, error) {
+	return base, nil
+}
 func (base *StubDB) Close()       {}
 
 func (base *StubDB) CreatePlayer(id string, balance int) error {

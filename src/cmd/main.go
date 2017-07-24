@@ -6,7 +6,7 @@ import (
 
 func main() {
 	close := make(chan struct{})
-	server := server.NewHTTPServer(port, host)
+	server := server.NewHTTPServer(port, host, close)
 	server.DB = db
 
 	server.Run()

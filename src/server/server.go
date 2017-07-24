@@ -14,17 +14,19 @@ import (
 	"reflect"
 )
 
-
 type HTTPServer struct {
-	Port int32
-	Host string
-	DB   dao.DAOInterface
+	Port     int32
+	Host     string
+	StopProg chan struct{}
+	DB       dao.DAOInterface
 }
 
-func NewHTTPServer(port int32, host string) *HTTPServer {
+func NewHTTPServer(port int32, host string, stop chan struct{}) *HTTPServer {
 	return &HTTPServer{
-		Port: port,
-		Host: host,
+		Port:     port,
+		Host:     host,
+		StopProg: stop,
+
 	}
 }
 
@@ -32,10 +34,11 @@ func (server *HTTPServer) Run() {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error("HTTPServer Failed")
+			server.StopProg <- struct{}{}
 		}
 	}()
 
-	go Init()
+	go InitLogger()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/fund", server.getFundHandler).Methods(http.MethodGet)
@@ -61,7 +64,6 @@ func (server *HTTPServer) Run() {
 }
 
 func (server HTTPServer) getResultTournamentHandler(w http.ResponseWriter, r *http.Request) {
-
 	dataBase, err := server.DB.Init()
 	if err != nil {
 		server.sendFailRespons(w, "getBalanceHandler. Have not player", http.StatusBadRequest, nil)
@@ -84,14 +86,12 @@ func (server HTTPServer) getResultTournamentHandler(w http.ResponseWriter, r *ht
 	}
 
 	team := server.getTeamWhichWon(winner.Winners[0].PlayerID, tournament.TeamMembers)
-
 	if reflect.DeepEqual(team, models.Team{}) {
 		server.sendFailRespons(w, "getResultTournamentHandler.Cant found team which won", http.StatusBadRequest, nil)
 		return
 	}
 
 	err = server.addBonus(winner.Winners[0].Prize, tournament.Deposit, team, &winner, dataBase)
-
 	if err != nil {
 		server.sendFailRespons(w, "getResultTournamentHandler. Cant add bonus", http.StatusBadRequest, err)
 		return
@@ -108,7 +108,6 @@ func (server HTTPServer) getResultTournamentHandler(w http.ResponseWriter, r *ht
 }
 
 func (server HTTPServer) addBonus(prize, deposit int, team models.Team, winner *models.ResultTurnament, baseConn dao.DAOInterface) error {
-
 	var win []models.Winner
 
 	for key, val := range team.Proportion {
@@ -160,13 +159,12 @@ func (server HTTPServer) getBalanceHandler(w http.ResponseWriter, r *http.Reques
 func (server HTTPServer) getRecetHandler(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := server.DB.Init()
 	if err != nil {
-		server.sendFailRespons(w, "getBalanceHandler. Have not player", http.StatusBadRequest, nil)
+		server.sendFailRespons(w, "getRecetHandler. Cant connection to DB", http.StatusInternalServerError, err)
 		return
 	}
 	defer dataBase.Close()
 
 	err = dataBase.DeleteAll()
-
 	if err != nil {
 		server.sendFailRespons(w, "getRecetHandler. Can't deleted db", http.StatusInternalServerError, err)
 		return
@@ -180,11 +178,15 @@ func (server HTTPServer) getRecetHandler(w http.ResponseWriter, r *http.Request)
 func (server HTTPServer) getFundHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	dataBase, err := server.DB.Init()
+	if err != nil {
+		server.sendFailRespons(w, "getFundHandler. Cant connection to DB", http.StatusInternalServerError, err)
+		return
+	}
 	defer dataBase.Close()
 
 	if err != nil {
-		log.Errorf("getTournamentHandler. Can't create db client")
-		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+		server.sendFailRespons(w, "getTournamentHandler. Can't create db client", http.StatusInternalServerError, err)
+		return
 	}
 
 	id := server.getValue(w, r, "playerId", "Invalid id")
@@ -219,13 +221,15 @@ func (server HTTPServer) getTakeHandler(w http.ResponseWriter, r *http.Request) 
 
 	dataBase, err := server.DB.Init()
 	if err != nil {
-		server.sendFailRespons(w, "getBalanceHandler. Have not player", http.StatusBadRequest, nil)
+		server.sendFailRespons(w, "getTakeHandler. Cant connection to DB", http.StatusInternalServerError, err)
 		return
 	}
 	defer dataBase.Close()
 
 	id := server.getValue(w, r, "playerId", "Invalid id")
+
 	if id == "" {
+		server.sendFailRespons(w, "getBalanceHandler. id is empty", http.StatusBadRequest, nil)
 		return
 	}
 
@@ -235,8 +239,7 @@ func (server HTTPServer) getTakeHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if dataBase.UpdatePlayerBalance(id, 0-balance) != nil {
-		log.Errorf("getTakeHandler. Can't write to db")
-		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+		server.sendFailRespons(w, "getTakeHandler. Can't write to db", http.StatusInternalServerError, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -248,7 +251,7 @@ func (server HTTPServer) getTournamentHandler(w http.ResponseWriter, r *http.Req
 
 	dataBase, err := server.DB.Init()
 	if err != nil {
-		server.sendFailRespons(w, "getBalanceHandler. Have not player", http.StatusBadRequest, nil)
+		server.sendFailRespons(w, "getTournamentHandler. Cant connection to DB", http.StatusInternalServerError, err)
 		return
 	}
 	defer dataBase.Close()
@@ -259,8 +262,7 @@ func (server HTTPServer) getTournamentHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if dataBase.CheckTournament(tournamentId) {
-		log.Errorf("getTournamentHandler. We have this tournamentId in the base. Choose another id")
-		http.Error(w, "500 Internal Server Error", http.StatusBadRequest)
+		server.sendFailRespons(w, "getTournamentHandler. We have this tournamentId in the base. Choose another id", http.StatusBadRequest, nil)
 		return
 	}
 
@@ -283,7 +285,7 @@ func (server HTTPServer) getTournamentHandler(w http.ResponseWriter, r *http.Req
 func (server HTTPServer) getJoinTournamentHandler(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := server.DB.Init()
 	if err != nil {
-		server.sendFailRespons(w, "getBalanceHandler. Have not player", http.StatusBadRequest, nil)
+		server.sendFailRespons(w, "getJoinTournamentHandler. Cant connection to DB", http.StatusInternalServerError, err)
 		return
 	}
 	defer dataBase.Close()
@@ -295,8 +297,7 @@ func (server HTTPServer) getJoinTournamentHandler(w http.ResponseWriter, r *http
 
 	tournament := dataBase.GetTurnament(tournamentId)
 	if tournament == nil {
-		log.Errorf("getJoinTournamentHandler. We have not this tournamentId in the base. Choose another id")
-		http.Error(w, "500 Internal Server Error", http.StatusBadRequest)
+		server.sendFailRespons(w, "getJoinTournamentHandler. We have not this tournamentId in the base. Choose another id", http.StatusBadRequest, nil)
 		return
 	}
 
@@ -312,8 +313,7 @@ func (server HTTPServer) getJoinTournamentHandler(w http.ResponseWriter, r *http
 
 	err = dataBase.UpdateTeamTournament(tournamentId, team)
 	if err != nil {
-		log.Errorf("getJoinTournamentHandler. Cant added team to the tournament")
-		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+		server.sendFailRespons(w, "getJoinTournamentHandler. Cant added team to the tournament", http.StatusInternalServerError, nil)
 		return
 	}
 
