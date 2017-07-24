@@ -19,10 +19,14 @@ const (
 
 type SQL struct {
 	DB *sql.DB
+	User string
+	Password string
+	URI string
+	TypeConn string
 }
 
 func (base *SQL) Init() (dao.DAOInterface, error) {
-	db, err := sql.Open("mysql", "root:sem1920dark@tcp(127.0.0.1:3306)/"+nameDB)
+	db, err := sql.Open("mysql", base.User+":"+base.Password+"@"+base.TypeConn+"("+base.URI+")/"+nameDB)
 	if err != nil {
 		return nil, err
 	}
