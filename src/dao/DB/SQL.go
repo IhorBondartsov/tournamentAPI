@@ -1,10 +1,10 @@
 package DB
 
 import (
-	"github.com/KharkivGophers/TeamplayerAPI/src/models"
+	"github.com/IhorBondartsov/tournamentAPIv/tournamentAPI/src/models"
 	_ "github.com/go-sql-driver/mysql"
 	"database/sql"
-	"github.com/KharkivGophers/TeamplayerAPI/src/dao"
+	"github.com/IhorBondartsov/tournamentAPIv/tournamentAPI/src/dao"
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -18,10 +18,10 @@ const (
 )
 
 type SQL struct {
-	DB *sql.DB
-	User string
+	DB       *sql.DB
+	User     string
 	Password string
-	URI string
+	URI      string
 	TypeConn string
 }
 

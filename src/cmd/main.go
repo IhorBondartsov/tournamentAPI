@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/KharkivGophers/TeamplayerAPI/src/server"
+	"github.com/IhorBondartsov/tournamentAPI/src/server"
 )
 
 func main() {

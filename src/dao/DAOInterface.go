@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/KharkivGophers/TeamplayerAPI/src/models"
+	"github.com/IhorBondartsov/tournamentAPI/src/models"
 )
 
 type DAOInterface interface {

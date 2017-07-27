@@ -1,8 +1,8 @@
 package DB
 
 import (
-	"github.com/KharkivGophers/TeamplayerAPI/src/models"
-	"github.com/KharkivGophers/TeamplayerAPI/src/dao"
+	"github.com/IhorBondartsov/tournamentAPI/src/models"
+	"github.com/IhorBondartsov/tournamentAPI/src/dao"
 )
 
 type StubDB struct {

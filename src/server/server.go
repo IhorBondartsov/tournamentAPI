@@ -4,12 +4,13 @@ import (
 	"github.com/gorilla/mux"
 	"fmt"
 	"time"
+
 	"github.com/gorilla/handlers"
 	"net/http"
-	"github.com/KharkivGophers/TeamplayerAPI/src/dao"
-	"github.com/KharkivGophers/TeamplayerAPI/src/sys"
+	"github.com/IhorBondartsov/tournamentAPI/src/dao"
+	"github.com/IhorBondartsov/tournamentAPI/src/sys"
 	"strconv"
-	"github.com/KharkivGophers/TeamplayerAPI/src/models"
+	"github.com/IhorBondartsov/tournamentAPI/src/models"
 	"encoding/json"
 	"reflect"
 )

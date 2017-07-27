@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/KharkivGophers/TeamplayerAPI/src/dao"
-	"github.com/KharkivGophers/TeamplayerAPI/src/dao/DB"
+	"github.com/IhorBondartsov/tournamentAPI/src/dao"
+	"github.com/IhorBondartsov/tournamentAPI/src/dao/DB"
 )
 
 var (
