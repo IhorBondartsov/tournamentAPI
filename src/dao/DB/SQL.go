@@ -1,10 +1,10 @@
 package DB
 
 import (
-	"github.com/IhorBondartsov/tournamentAPIv/tournamentAPI/src/models"
+	"github.com/IhorBondartsov/tournamentAPI/src/models"
 	_ "github.com/go-sql-driver/mysql"
 	"database/sql"
-	"github.com/IhorBondartsov/tournamentAPIv/tournamentAPI/src/dao"
+	"github.com/IhorBondartsov/tournamentAPI/src/dao"
 	log "github.com/Sirupsen/logrus"
 )
 
