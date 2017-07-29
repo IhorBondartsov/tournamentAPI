@@ -7,7 +7,7 @@ import (
 
 var (
 	host string = "0.0.0.0"
-	port int32  = 8100
+	port int32  = 8080
 
 
 	baseUser string = "root"

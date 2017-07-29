@@ -1,15 +1,23 @@
-FROM alpine:edge AS build
-RUN apk update
-RUN apk upgrade
-RUN apk add --update go=1.8.3-r0 gcc=6.4.0-r4 g++=6.4.0-r4
-WORKDIR /github.com/IhorBondartsov/tournamentAPI/src/
-ENV GOPATH /github.com/IhorBondartsov/tournamentAPI/src/
-ADD src /github.com/IhorBondartsov/tournamentAPI/src/cmd/
-RUN go get cmd
-    RUN CGO_ENABLED=1 GOOS=linux go install -a cmd
+FROM golang
 
-FROM alpine:edge
-WORKDIR /github.com/IhorBondartsov/tournamentAPI/src/
-RUN cd /github.com/IhorBondartsov/tournamentAPI/src/
-COPY --from=build /github.com/IhorBondartsov/tournamentAPI/src/cmd /github.com/IhorBondartsov/tournamentAPI/src/cmd
-CMD ["/github.com/IhorBondartsov/tournamentAPI/src/cmd"]
+ADD .           /go/src/github.com/IhorBondartsov/tournamentAPI
+ADD src         /github.com/IhorBondartsov/tournamentAPI/src
+ADD src/cmd     /github.com/IhorBondartsov/tournamentAPI/src/cmd
+ADD src/dao     /github.com/IhorBondartsov/tournamentAPI/src/dao
+ADD src/dao/DB  /github.com/IhorBondartsov/tournamentAPI/src/dao/DB
+ADD src/models  /github.com/IhorBondartsov/tournamentAPI/src/models
+ADD src/server  /github.com/IhorBondartsov/tournamentAPI/src/server
+ADD src/sys     /github.com/IhorBondartsov/tournamentAPI/src/sys
+
+RUN go get github.com/gorilla/mux
+RUN go get github.com/gorilla/handlers
+RUN go get github.com/go-sql-driver/mysql
+RUN go get github.com/Sirupsen/logrus
+
+RUN go install github.com/IhorBondartsov/tournamentAPI/src/cmd/
+
+ENTRYPOINT /go/bin/cmd
+
+
+EXPOSE 8080
+
